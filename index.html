@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dasbor Interaktif: Peran Muhammadiyah bagi Bangsa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Warm Neutral Green -->
+    <!-- Application Structure Plan: SPA ini dirancang dengan struktur dashboard yang berfokus pada eksplorasi. Pengguna memulai dari halaman sambutan (welcome) dengan informasi tim. Setelah menekan tombol 'Mulai', mereka akan masuk ke halaman utama yang terbagi menjadi empat panel utama: Visi & Sejarah, Kontribusi, Tantangan, dan Solusi. Alih-alih satu halaman yang panjang, setiap panel dapat berinteraksi secara mandiri, membuat informasi terasa lebih terstruktur dan ringkas. Visualisasi interaktif seperti grafik yang dapat diperbarui dan kartu yang dapat diperluas digunakan untuk mendorong pengguna menjelajahi konten secara mendalam, alih-alih hanya menggulir ke bawah. -->
+    <!-- Visualization & Content Choices: 
+    1. Halaman Sambutan -> Goal: Memberi pengakuan pada tim dan menyambut pengguna -> Method: Layar statis sederhana dengan tombol -> Interaction: Klik tombol untuk beralih ke dasbor utama -> Justification: Memenuhi permintaan untuk menampilkan nama tim tanpa mengganggu alur eksplorasi utama.
+    2. Visi & Sejarah -> Goal: Mengilustrasikan evolusi secara kronologis -> Method: Timeline Interaktif (HTML/CSS/JS) dengan visual yang menarik -> Interaction: Klik untuk membuka deskripsi detail -> Justification: Lebih menarik dan mudah dicerna daripada paragraf padat.
+    3. Kontribusi -> Goal: Menunjukkan skala dampak kuantitatif -> Method: Grafik Batang yang dapat diperbarui (Chart.js) dengan tab untuk beralih data -> Interaction: Pengguna mengklik tab untuk melihat data berbeda (Pendidikan, Kesehatan, dll) -> Justification: Memberikan kendali kepada pengguna dan menunjukkan data dari berbagai perspektif.
+    4. Tantangan -> Goal: Memperkenalkan isu-isu kompleks dengan ringkas -> Method: Kartu interaktif dalam tata letak grid -> Interaction: Hover untuk efek visual dan klik untuk menunjukkan detail lebih lanjut dalam sebuah modal -> Justification: Menjaga antarmuka utama tetap bersih dan memungkinkan detail ditampilkan hanya saat diminta.
+    5. Solusi -> Goal: Menyajikan konsep-konsep abstrak dengan jelas -> Method: Kartu berdesain clean yang memperluas ke modal detail -> Interaction: Klik untuk memunculkan modal dengan penjelasan mendalam -> Justification: Mengubah konsep-konsep menjadi unit yang dapat dieksplorasi.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F5F2; 
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 40vh;
+            max-height: 450px;
+        }
+        .nav-link.active {
+            color: #3B753B;
+            font-weight: 700;
+        }
+        .welcome-page {
+            background-color: #3B753B;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            min-height: 100vh;
+            text-align: center;
+        }
+        .welcome-container {
+            max-width: 600px;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            background-color: rgba(0, 0, 0, 0.1); 
+        }
+        .welcome-list {
+            list-style: none;
+            padding: 0;
+            line-height: 1.75;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: #ffffff;
+            color: #333;
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.open .modal-content {
+            transform: scale(1);
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Halaman Sambutan (Default View) -->
+    <div id="welcome-page" class="welcome-page">
+        <div class="welcome-container">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Tugas PKMD Kelompok 5</h1>
+            <p class="text-lg mb-8">PHIWM Dalam Berbangsa dan Bernegara</p>
+            <p class="text-lg mb-8">Dosen Pengampu : Drs. Asrori Zaeni, M.Ag.</p>
+            <p class="text-lg mb-8">Disusun oleh:</p>
+            <ul class="welcome-list text-md mb-8">
+                <li>1. Nanang Rosid Abidin</li>
+                <li>2. Cahyo Utomo</li>
+                <li>3. Laela Tafriqoh</li>
+                <li>4. Lyi Marfu’atin Jamilah</li>
+                <li>5. Suki Turyanti</li>
+                <li>6. Ardila Eva</li>
+                <li>7. Astin Yulika</li>
+                <li>8. Viannisa Rahma Rizqia</li>
+            </ul>
+            <button id="start-button" class="bg-[#B48A60] text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-[#A3B18A] transition">Mulai Eksplorasi</button>
+        </div>
+    </div>
+
+    <!-- Halaman Utama (Tersembunyi Awalnya) -->
+    <div id="main-page" class="hidden">
+        <header class="bg-white shadow-sm sticky top-0 z-50">
+            <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <div class="text-2xl font-bold text-[#3B753B]">
+                    Muhammadiyah
+                </div>
+                <ul class="hidden md:flex space-x-8">
+                    <li><a href="#" data-section="sejarah" class="nav-link text-gray-600 hover:text-[#3B753B] pb-1">Sejarah</a></li>
+                    <li><a href="#" data-section="peran" class="nav-link text-gray-600 hover:text-[#3B753B] pb-1">Kontribusi</a></li>
+                    <li><a href="#" data-section="tantangan" class="nav-link text-gray-600 hover:text-[#3B753B] pb-1">Tantangan</a></li>
+                    <li><a href="#" data-section="solusi" class="nav-link text-gray-600 hover:text-[#3B753B] pb-1">Solusi</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="container mx-auto px-6 py-12">
+            <!-- Section Visi & Sejarah -->
+            <section id="sejarah" class="min-h-screen py-16 flex items-center justify-center">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="md:order-last">
+                        <h2 class="text-3xl font-bold mb-4 text-[#3B753B]">Gerakan Dakwah & Tajdid</h2>
+                        <p class="text-gray-600 mb-6">Muhammadiyah, didirikan oleh K.H. Ahmad Dahlan pada tahun 1912, adalah salah satu organisasi Islam terbesar di Indonesia yang memainkan peran krusial dalam membentuk masyarakat modern. Gerakan ini bertujuan untuk mengembalikan umat pada ajaran Al-Qur'an dan Sunnah secara murni. </p>
+                        <p class="text-gray-600">Tajdid, atau pembaruan, dalam dua dimensi purifikasi untuk Akidah dan Ibadah, Dinamisasi untuk Muamalah Duniawiyah, menjadi pilar utama yang mendorong Muhammadiyah untuk terus beradaptasi dengan perubahan zaman tanpa meninggalkan prinsip-prinsip dasar Islam. Pendekatan ini tidak hanya berfokus pada ranah ibadah, melainkan juga merambah ke sektor pendidikan, kesehatan, dan sosial.</p>
+                    </div>
+                    <div class="relative">
+                        <div id="timeline-container" class="space-y-8">
+                            <!-- Timeline items will be dynamically inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Kontribusi & Dampak -->
+            <section id="peran" class="min-h-screen py-16 flex flex-col justify-center">
+                <h2 class="text-3xl font-bold text-center mb-2 text-[#3B753B]">Kontribusi Nyata: Membangun Karakter Bangsa</h2>
+                <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">Kontribusi Muhammadiyah tidak terbatas pada ranah agama, tetapi juga meresap ke dalam pembentukan karakter dan kemajuan bangsa melalui pilar-pilar aksi nyata. Jelajahi data amal usaha di bawah ini untuk melihat dampaknya.</p>
+                <div class="flex justify-center space-x-4 mb-8">
+                    <button class="tab-button bg-[#B48A60] text-white px-4 py-2 rounded-full font-semibold hover:bg-[#A3B18A] transition" data-category="Pendidikan">Pendidikan</button>
+                    <button class="tab-button bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-gray-300 transition" data-category="Kesehatan">Kesehatan</button>
+                    <button class="tab-button bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-gray-300 transition" data-category="Sosial">Sosial</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="amalUsahaChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Section Tantangan Masa Kini -->
+            <section id="tantangan" class="min-h-screen py-16 flex flex-col justify-center">
+                <h2 class="text-3xl font-bold text-center mb-2 text-[#3B753B]">Menghadapi Tantangan Kebangsaan</h2>
+                <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">Di era modern, Indonesia menghadapi tantangan kompleks yang membutuhkan respons bijak. Muhammadiyah mengidentifikasi tiga area krusial yang perlu perhatian. Pilih salah satu kartu untuk menjelajahi tantangan secara lebih dalam.</p>
+                <div id="challenges-grid" class="grid md:grid-cols-3 gap-8">
+                    <!-- Cards will be inserted here -->
+                </div>
+            </section>
+
+            <!-- Section Solusi & Visi -->
+            <section id="solusi" class="min-h-screen py-16 flex flex-col justify-center">
+                <h2 class="text-3xl font-bold text-center mb-2 text-[#3B753B]">Solusi Visioner untuk Indonesia</h2>
+                <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">Sebagai respons atas tantangan, Muhammadiyah menawarkan kerangka berpikir dan konsep solutif yang berakar pada nilai keislaman dan keindonesiaan. Jelajahi setiap konsep untuk memahami gagasannya.</p>
+                <div id="solutions-grid" class="grid md:grid-cols-3 gap-8">
+                    <!-- Cards will be inserted here -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Modal for details -->
+        <div id="detail-modal" class="modal-overlay hidden">
+            <div class="modal-content w-full md:w-3/4 lg:w-1/2">
+                <h3 id="modal-title" class="text-2xl font-bold mb-4 text-[#3B753B]"></h3>
+                <p id="modal-content" class="text-gray-600 mb-4"></p>
+                <button id="modal-close" class="mt-4 bg-[#B48A60] text-white px-4 py-2 rounded-full hover:bg-[#A3B18A] transition">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const welcomePage = document.getElementById('welcome-page');
+            const mainPage = document.getElementById('main-page');
+            const startButton = document.getElementById('start-button');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const timelineContainer = document.getElementById('timeline-container');
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const challengesGrid = document.getElementById('challenges-grid');
+            const solutionsGrid = document.getElementById('solutions-grid');
+            const modalOverlay = document.getElementById('detail-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            const modalClose = document.getElementById('modal-close');
+
+            const DATA = {
+                amalUsaha: {
+                    Pendidikan: {
+                        label: 'Jumlah Lembaga Pendidikan',
+                        data: [5354, 172, 440]
+                    },
+                    Kesehatan: {
+                        label: 'Jumlah Unit Kesehatan',
+                        data: [122, 231]
+                    },
+                    Sosial: {
+                        label: 'Jumlah Lembaga Sosial',
+                        data: [1012]
+                    }
+                },
+                timeline: [
+                    { year: '1912', title: 'Pendirian Muhammadiyah', content: 'Didirikan oleh K.H. Ahmad Dahlan, Muhammadiyah lahir sebagai respons terhadap kondisi umat Islam yang dianggap jumud dan tercampur praktik non-Islami.' },
+                    { year: '1918', title: 'Aisyiyah Didirikan', content: 'Aisyiyah, organisasi perempuan Muhammadiyah, didirikan untuk memberdayakan perempuan dan memajukan pendidikan serta sosial. ' },
+                    { year: '1920', title: 'Mendirikan Penolong Kesengsaraan Oemoem (PKO)', content: 'Lembaga sosial yang dibentuk untuk mengelola dan mengembangkan pelayanan sosial Muhammadiyah.' },
+                                    ],
+                challenges: [
+                    { title: 'Tantangan Demokrasi', content: 'Praktik demokrasi di Indonesia masih diwarnai oleh politik uang, korupsi, dan rendahnya kualitas partisipasi publik. Muhammadiyah mengawal demokrasi agar tetap berada di jalur yang benar dan menghasilkan pemimpin yang berintegritas.' },
+                    { title: 'Polarisasi Politik', content: 'Perbedaan pandangan politik seringkali memicu perpecahan di masyarakat. Muhammadiyah, dengan posisinya yang netral, Sesuai dengan Khittah Surabaya 1978, Muhammadiyah memilih sikap independen-aktif dalam politik: tidak berafiliasi dengan partai politik mana pun, namun mendorong warganya untuk berpartisipasi secara proaktif dalam proses politik di Indonesia.' },
+                    { title: 'Arus Globalisasi', content: 'Globalisasi membawa kemajuan sekaligus tantangan berupa infiltrasi budaya asing dan penyebaran paham radikalisme. Muhammadiyah harus mampu membentengi umat dari dampak negatif sambil mengambil manfaat dari kemajuan teknologi.' }
+                ],
+                solutions: [
+                    { title: 'Pribadi Muslim Kaffah (PHIWM)', content: 'Muhammadiyah menekankan pentingnya pembentukan Pribadi Muslim yang Kaffah (PHIWM) sebagai individu yang memegang teguh ajaran Islam dan Pancasila, berkontribusi positif, dan siap menghadapi tantangan zaman. PHIWM menjadi fondasi kuat untuk membangun karakter bangsa yang unggul. Tujuannya adalah membentuk pribadi yang paripurna, menjadi teladan, dan membawa perubahan positif. Konsep ini mencakup seluruh aspek kehidupan, mulai dari kehidupan pribadi, keluarga, bermasyarakat, berorganisasi, hingga berbangsa dan bernegara, menunjukkan sifatnya yang holistik.' },
+                    { title: 'Politik Kebangsaan', content: 'Muhammadiyah menyerukan praktik Politik Kebangsaan yang berorientasi pada kepentingan bangsa di atas segalanya. Konsep ini mendorong elite politik untuk berkompetisi secara sehat dan beretika, serta menjadikan Pancasila sebagai landasan utama dalam berpolitik.  Salah satu yang diserukan dalam Muktamar Makasar adalah Jihad Konstitusi.' },
+                    { title: 'Darul Ahdi wa Syahadah', content: 'Istilah ini merujuk pada Indonesia sebagai negara konsensus dan negara kesaksian. Sebagai negara konsensus (Darul Ahdi), Indonesia adalah tempat di mana berbagai kelompok hidup berdampingan. Sebagai negara kesaksian (Darul Syahadah), umat Islam Indonesia memiliki tanggung jawab untuk menjadi saksi atas kebenaran Islam dan menegakkan keadilan.' },
+                    { title: 'Kesimpulan', content: 'Di era kontemporer, Muhammadiyah terus membuktikan relevansinya dengan respons yang adaptif terhadap tantangan kebangsaan. Sikap independen-aktif dalam politik memungkinkannya untuk menjadi kekuatan penyeimbang yang meredam polarisasi. Sementara itu, kerangka tajdid memandu organisasi untuk beradaptasi dengan kemajuan global tanpa kehilangan identitas keislaman. Platform solusi yang diusungnya—PHIWM, Politik Kebangsaan, dan Darul Ahdi wa Syahadah—secara kolektif membentuk sebuah grand strategy yang matang dan holistik, menunjukkan bahwa Muhammadiyah tidak hanya bertahan, tetapi juga menjadi pelopor perubahan yang progresif di tengah dinamika zaman.' }
+                ]
+            };
+
+            // Initial Welcome Page Logic
+            startButton.addEventListener('click', () => {
+                welcomePage.classList.add('hidden');
+                mainPage.classList.remove('hidden');
+                document.body.style.backgroundColor = '#F8F5F2';
+            });
+            
+            // Generate Timeline
+            let timelineHtml = '';
+            DATA.timeline.forEach((item, index) => {
+                timelineHtml += `
+                <div class="relative pl-8">
+                    <div class="absolute w-8 h-8 rounded-full bg-[#B48A60] -left-4 top-1 flex items-center justify-center text-white font-bold">${index + 1}</div>
+                    <div class="bg-white p-6 rounded-lg shadow-md transition transform hover:scale-105 duration-300 cursor-pointer" data-timeline-index="${index}">
+                        <h3 class="text-xl font-semibold mb-2 text-[#3B753B]">${item.year}: ${item.title}</h3>
+                        <p class="text-gray-600 hidden">${item.content}</p>
+                    </div>
+                </div>
+                `;
+            });
+            timelineContainer.innerHTML = timelineHtml;
+            
+            document.querySelectorAll('[data-timeline-index]').forEach(item => {
+                item.addEventListener('click', function() {
+                    const content = this.querySelector('p');
+                    if (content.classList.contains('hidden')) {
+                        document.querySelectorAll('[data-timeline-index] p').forEach(p => p.classList.add('hidden'));
+                        content.classList.remove('hidden');
+                    } else {
+                        content.classList.add('hidden');
+                    }
+                });
+            });
+
+            // Generate Challenge and Solution Cards
+            let challengesHtml = '';
+            DATA.challenges.forEach((item, index) => {
+                challengesHtml += `
+                <div class="card card-hover p-6 bg-white rounded-lg shadow-md border-2 border-transparent transition cursor-pointer" data-index="${index}" data-type="challenge">
+                    <h3 class="text-xl font-semibold text-[#3B753B] mb-2">${item.title}</h3>
+                    <p class="text-gray-600">${item.content.split('.')[0]}.</p>
+                </div>
+                `;
+            });
+            challengesGrid.innerHTML = challengesHtml;
+
+            let solutionsHtml = '';
+            DATA.solutions.forEach((item, index) => {
+                solutionsHtml += `
+                <div class="card card-hover p-6 bg-white rounded-lg shadow-md border-2 border-transparent transition cursor-pointer" data-index="${index}" data-type="solution">
+                    <h3 class="text-xl font-semibold text-[#3B753B] mb-2">${item.title}</h3>
+                    <p class="text-gray-600">${item.content.split('.')[0]}.</p>
+                </div>
+                `;
+            });
+            solutionsGrid.innerHTML = solutionsHtml;
+
+            // Modal and Card Interaction
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const type = this.getAttribute('data-type');
+                    const index = parseInt(this.getAttribute('data-index'));
+                    let item;
+                    if (type === 'challenge') {
+                        item = DATA.challenges[index];
+                    } else if (type === 'solution') {
+                        item = DATA.solutions[index];
+                    }
+                    modalTitle.textContent = item.title;
+                    modalContent.textContent = item.content;
+                    modalOverlay.classList.remove('hidden');
+                    modalOverlay.classList.add('open');
+                });
+            });
+
+            modalClose.addEventListener('click', () => {
+                modalOverlay.classList.remove('open');
+                setTimeout(() => {
+                    modalOverlay.classList.add('hidden');
+                }, 300);
+            });
+
+            // Chart.js
+            let currentChart = null;
+            function renderChart(category) {
+                if (currentChart) {
+                    currentChart.destroy();
+                }
+
+                const dataConfig = DATA.amalUsaha[category];
+                const labels = {
+                    'Pendidikan': ['Sekolah/Madrasah', 'Perguruan Tinggi', 'PesantrenMu'],
+                    'Kesehatan': ['RS', 'Klinik',],
+                    'Sosial': ['MCC/LKSA']
+                };
+
+                const ctx = document.getElementById('amalUsahaChart').getContext('2d');
+                currentChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels[category],
+                        datasets: [{
+                            label: dataConfig.label,
+                            data: dataConfig.data,
+                            backgroundColor: 'rgba(59, 117, 59, 0.7)',
+                            borderColor: 'rgba(59, 117, 59, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: {
+                                display: true,
+                                text: dataConfig.label,
+                                font: { size: 16 }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.parsed.y + ' unit';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Jumlah Unit' }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('bg-[#B48A60]', 'text-white');
+                        btn.classList.add('bg-gray-200', 'text-gray-700');
+                    });
+                    this.classList.remove('bg-gray-200', 'text-gray-700');
+                    this.classList.add('bg-[#B48A60]', 'text-white');
+                    renderChart(this.getAttribute('data-category'));
+                });
+            });
+
+            // Initial chart render
+            renderChart('Pendidikan');
+
+            // Navigasi
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sectionId = this.getAttribute('data-section');
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        section.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
